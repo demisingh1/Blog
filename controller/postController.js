@@ -1,4 +1,15 @@
 const post = require("../models/postModal");
+const User = require("../models/userModal");
+
+const ShowAllPosts = async(req,res)=>{
+  try {
+    let AllPosts = await post.find({}).populate("user")
+  res.status(200).json({AllPosts});
+  } catch (error) {
+    res.status(400).json(error);
+  }
+  
+}
 
 const ShowPost = async (req, res) => {
   console.log(req.cookies);
@@ -51,5 +62,5 @@ module.exports = {
   ShowPost,
   CreatePost,
   deletePost,
-  Updatepost,
+  Updatepost,ShowAllPosts
 };
