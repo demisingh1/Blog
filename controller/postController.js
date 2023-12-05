@@ -1,6 +1,7 @@
 const post = require("../models/postModal");
 
 const ShowPost = async (req, res) => {
+  console.log(req.cookies);
   const id = req.id;
   const userPosts = await post.find({ user: id });
   if (!userPosts) {
