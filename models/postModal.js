@@ -12,7 +12,9 @@ const postSchema = new mongoose.Schema({
        user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
-       }
+       },
+       imgurl:String,
+       imgid:String,
 })
 
 const post = mongoose.model("post" , postSchema)

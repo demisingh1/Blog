@@ -1,5 +1,17 @@
 const post = require("../models/postModal");
 const User = require("../models/userModal");
+const cloudinary = require('cloudinary')
+const fs = require('fs');
+// import {v2 as cloudinary} from 'cloudinary';
+          
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.API_KEY, 
+  api_secret: process.env.API_SECRET 
+});
+
+  
+
 
 const ShowAllPosts = async(req,res)=>{
   try {
@@ -22,13 +34,19 @@ const ShowPost = async (req, res) => {
   }
 };
 const CreatePost = async (req, res) => {
-  const { title, description } = req.body;
-  const NewPost = await post.create({
-    title,
-    description,
-    user: req.id,
-  });
-  res.json({ message: NewPost });
+  let newPost = {...req.body}
+      newPost.user = req.id
+ if(req.file){
+  const result = await cloudinary.v2.uploader.upload(req.file.path)
+  // { public_id: "olympic_flag" }, 
+  // function(error, result) {console.log(result); });
+  console.log(result);
+  fs.unlink(req.file.path ,(err)=>{console.log(err)})
+  newPost.imgurl = result.secure_url;
+  newPost.imgid = result.public_id;
+ }
+  const FinalCreatedPost = await post.create({...newPost});
+  res.send(FinalCreatedPost);
 };
 
 const deletePost = async (req, res) => {
@@ -49,9 +67,18 @@ const deletePost = async (req, res) => {
 const Updatepost = async (req, res) => {
   let { id } = req.params;
   try {
+    let newPost = {...req.body}
+    if(req.file){
+      let result = await cloudinary.v2.uploader.upload(req.file.path)
+      fs.unlink(req.file.path,(err)=>console.log(err))
+      newPost.imgurl = result.secure_url
+      newPost.imgid = result.public_id
+    }
     let UpPost = await post
-      .findOneAndUpdate({ _id: id },req.body,{new:true})
-      .where({ user:req.id });
+      .findOneAndUpdate({ _id: id },{...newPost},{new:false}).where({ user:req.id });
+      if(req.file && UpPost.imgid){
+        await cloudinary.v2.api.delete_resources(UpPost.imgid)
+      }
     res.json({ message: UpPost });
   } catch (error) {
     res.json({ error });
