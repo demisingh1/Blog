@@ -23,15 +23,28 @@ const ShowAllPosts = async(req,res)=>{
   
 }
 
-const ShowPost = async (req, res) => {
-  console.log(req.cookies);
-  const id = req.id;
-  const userPosts = await post.find({ user: id });
-  if (!userPosts) {
-    res.send("No post found");
-  } else {
-    res.json({ message: userPosts });
+const showUserPosts = async(req,res)=>{
+  let id = req.id;
+  // console.log(id);
+  try {
+    let AllPost = await post.find({user:id})
+    res.status(200).json({message:AllPost})
+  } catch (error) {
+    res.status(400).json({message:error})
   }
+
+}
+
+const ShowPost = async (req, res) => {
+  const {id} = req.params;
+  console.log(id)
+  try {
+    let userPost = await post.findOne({ _id:id });
+    res.status(200).json({ message: userPost });
+  } catch (error) {
+    res.status(400).send("No post found");
+  }
+ 
 };
 const CreatePost = async (req, res) => {
   let newPost = {...req.body}
@@ -89,5 +102,5 @@ module.exports = {
   ShowPost,
   CreatePost,
   deletePost,
-  Updatepost,ShowAllPosts
+  Updatepost,ShowAllPosts,showUserPosts
 };
