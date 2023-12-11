@@ -33,7 +33,7 @@ app.use(cors())
 app.use(cookieParser());
 app.use('/',userroute);
 app.use('/' , noteroute)
-app.listen(8000 , ()=>{
+app.listen(process.env.PORT , ()=>{
     dbConnection(process.env.DATABASE_URI);
     console.log('server started');
 })
