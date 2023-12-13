@@ -39,7 +39,7 @@ else{
     res.cookie('token' , token,{
         httpOnly:true,
         expires:new Date(Date.now() + oneDay),
-        secure:false    
+        secure:true   
     })
     ExistingUser.password=undefined;
   res.status(200).send({ExistingUser, token});
